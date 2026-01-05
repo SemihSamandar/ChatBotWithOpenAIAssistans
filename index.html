@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Customer Assistant Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chat-container {
+      width: 600px;
+      max-width: 95%;
+      height: 700px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header span {
+      font-size: 24px;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f9fafb;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      font-size: 15px;
+    }
+
+    .user {
+      margin-left: auto;
+      background: #4f46e5;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .assistant {
+      margin-right: auto;
+      background: #e5e7eb;
+      color: #111827;
+      border-bottom-left-radius: 4px;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 16px;
+      border-top: 1px solid #e5e7eb;
+      background: white;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #6366f1;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 0 20px;
+      border-radius: 10px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">
+    <span>🤖</span>
+    Customer Assistant
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input-area">
+    <input id="input" placeholder="Type your message..." />
+    <button onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<script>
+  let threadId = null;
+
+  async function startConversation() {
+    const res = await fetch("/start");
+    const data = await res.json();
+    threadId = data.thread_id;
+    addMessage("Hello! 👋 How can I help you today?", "assistant");
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById("input");
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage(message, "user");
+    input.value = "";
+
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        thread_id: threadId,
+        message: message
+      })
+    });
+
+    const data = await res.json();
+    addMessage(data.response, "assistant");
+  }
+
+  function addMessage(text, sender) {
+    const messages = document.getElementById("messages");
+    const div = document.createElement("div");
+    div.className = `message ${sender}`;
+    div.innerText = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  startConversation();
+</script>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import openai
 from openai import OpenAI
 import custom_functions
@@ -11,7 +11,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY")
 
 # Create Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".")
+
 
 # Initialize OpenAI client
 client = OpenAI(
@@ -22,6 +23,11 @@ client = OpenAI(
 # Create or load assistant
 assistant_id = custom_functions.create_assistant(
     client)  # this function comes from "functions.py"
+
+
+@app.route("/")
+def index():
+    return send_from_directory(".", "index.html")
 
 
 # Start conversation thread
@@ -91,3 +97,5 @@ def chat():
 
 if __name__ == '__main__':
     serve(app, host='0.0.0.0', port=8080)
+
+
