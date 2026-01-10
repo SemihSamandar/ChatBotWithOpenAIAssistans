@@ -120,8 +120,8 @@
 
 <div class="chat-container">
   <div class="chat-header">
-    <span>🤖</span>
-    Customer Assistant
+    <span>📚</span>
+     Academy Club Customer Assistant
   </div>
 
   <div class="messages" id="messages"></div>
@@ -139,7 +139,12 @@
     const res = await fetch("/start");
     const data = await res.json();
     threadId = data.thread_id;
-    addMessage("Hello! 👋 How can I help you today?", "assistant");
+  addMessage(
+  "Hello! 👋 I’m your Academy Club Education & Technology Assistant. How can I help?",
+  "assistant"
+);
+
+
   }
 
   async function sendMessage() {
